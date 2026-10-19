@@ -1,4 +1,4 @@
-const CACHE='art-book5-20261019-'+self.registration.scope;const ASSETS=['./','./index.html','./trainer.html','./trainer.js','./manifest.webmanifest','./icon.svg','./guide.html'];
+const CACHE='art-book5-audit-20261019-'+self.registration.scope;const ASSETS=['./','./index.html','./trainer.html','./trainer.js','./manifest.webmanifest','./icon.svg','./guide.html','./coverage.html'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==location.origin||!u.href.startsWith(self.registration.scope))return;e.respondWith(fetch(e.request).then(r=>{if(r.ok&&r.type!=='opaque'){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy))}return r}).catch(()=>caches.match(e.request).then(r=>r||(e.request.mode==='navigate'?caches.match(new URL('./trainer.html',self.registration.scope).href):Response.error()))))});
