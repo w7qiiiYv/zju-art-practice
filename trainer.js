@@ -134,7 +134,7 @@ $('#importFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';
  }else throw Error('请选择本程序备份或原学习台导出的完整数据');rebuild();await persist();scheduleSync();render();toast('已合并 '+n+' 条记录，现有数据已保留');}catch(err){toast('导入失败：'+err.message)}};
 function scheduleSync(){clearTimeout(syncTimer);syncTimer=setTimeout(()=>sync(false),3500);}
 function updateSync(text){syncText=text;$('#sync').textContent=text;}
-async function sync(manual=false){updateSync('本机保存 · 可离线');if(manual)toast('独立版无需登录，记录保存在本设备；跨设备请导出、导入备份')}
+async function sync(manual=false){const ready=location.protocol==='file:'||!!navigator.serviceWorker?.controller;updateSync(ready?'本机保存 · 离线已就绪':'本机保存 · 正在准备离线');if(manual)toast(ready?'独立版无需登录，记录保存在本设备；跨设备请导出、导入备份':'离线内容仍在准备，请保持联网，直到显示离线已就绪')}
 $('#sync').onclick=()=>sync(true);window.addEventListener('online',()=>sync(false));document.addEventListener('visibilitychange',()=>{if(document.hidden)persist();else sync(false)});window.addEventListener('pagehide',()=>persist());
 document.body.addEventListener('click',e=>{
  const b=e.target.closest('button');if(!b)return;
@@ -177,3 +177,5 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEven
 (async()=>{await load();store.events=store.events.filter(validEvent);rebuild();if(store.session&&store.session.ids.some(id=>!byId.has(id))){store.archivedSession=store.session;store.session=null}if(store.bankVersion!==BANK.version){store.bankVersion=BANK.version;toast('题库已更新：未核定旧题移出训练；原记录保留在备份中')}render();void persist();if(location.protocol!=='file:'&&'serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});sync(false);setInterval(updateTimer,1000);setInterval(()=>sync(false),60000);})().catch(err=>{document.getElementById('main').innerHTML='<section class=panel><h2>启动未完成</h2><p>请用 Safari 打开，关闭其他刷题窗口后重新载入。原学习记录未删除。</p><p>'+esc(err.message)+'</p><button onclick=location.reload()>重新载入</button></section>'});
 
 
+
+if(location.protocol!=='file:'&&'serviceWorker'in navigator){navigator.serviceWorker.ready.then(()=>updateSync('本机保存 · 离线已就绪'));navigator.serviceWorker.addEventListener('controllerchange',()=>updateSync('本机保存 · 离线已就绪'));}
