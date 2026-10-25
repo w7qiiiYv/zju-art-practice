@@ -142,7 +142,7 @@ document.body.addEventListener('click',e=>{
  if(b.dataset.sourcePage){openSourcePage(b.dataset.sourcePage);return}
  if(b.dataset.sourceFilter){sourceKind=b.dataset.sourceFilter;viewPage=1;render();return}
  if(b.hasAttribute('data-source-download')){cacheSourceBank(b);return}
- if(b.hasAttribute('data-book-audit')){setTab('audit');return}
+ if(b.hasAttribute('data-book-audit')){if($('#dialog').open)$('#dialog').close();setTab('audit');return}
  if(b.dataset.readPage){readBookPage(Number(b.dataset.readPage));return}
  if(b.hasAttribute('data-read-jump')){readBookPage(Number($('#auditPageNumber').value));return}
  if(b.dataset.sectionPractice){sectionPractice(b.dataset.sectionPractice);return}
