@@ -216,7 +216,7 @@ async function cacheSourceBank(button){
 function preserveQuestionHistory(){
  const previous=BANK.questionRevisionHistory;if(!previous)return;
  for(const event of store.events){const old=previous.questions[event.qid];if(event.type==='attempt'&&old&&!event.data.questionSnapshot){event.data.questionSnapshot={q:old.q,options:[...old.options],answers:[...old.answers]};event.data.questionRevision=old.revision;event.data.bankVersion=event.data.bankVersion||previous.fromVersion;}}
- if(store.session&&store.session.bankVersion!==BANK.version){store.session.questionSnapshots=store.session.questionSnapshots||{};for(const id of store.session.ids){if(previous.questions[id]&&!store.session.questionSnapshots[id])store.session.questionSnapshots[id]=previous.questions[id];}store.session.bankVersion=BANK.version;}
+ if(store.session&&store.session.bankVersion!==BANK.version){const needsPrevious=!store.session.bankVersion||store.session.bankVersion===previous.fromVersion;store.session.questionSnapshots=store.session.questionSnapshots||{};if(needsPrevious)for(const id of store.session.ids){if(previous.questions[id]&&!store.session.questionSnapshots[id])store.session.questionSnapshots[id]=previous.questions[id];}store.session.bankVersion=BANK.version;}
 }
 
 if(location.protocol!=='file:'&&'serviceWorker'in navigator){navigator.serviceWorker.ready.then(()=>updateSync('本机保存 · 离线已就绪'));navigator.serviceWorker.addEventListener('controllerchange',()=>updateSync('本机保存 · 离线已就绪'));}
