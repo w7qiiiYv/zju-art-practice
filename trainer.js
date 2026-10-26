@@ -120,7 +120,7 @@ function explanationInOrder(text,order){const letter=i=>'ABCD'[order.indexOf(i)]
 function answerPanel(q,r,order){
  const expected=answerFor(q),letters=expected.map(i=>'ABCD'[order.indexOf(i)]).sort().join('、'),d=derived.get(q.id);
  const evidence=q.optionEvidence||[],reasons=new Set(evidence.map(e=>e.reason).filter(Boolean));
- let overview=q.explain||'';for(const reason of reasons)overview=overview.replaceAll(reason,'');overview=overview.replace(/^本题选(?:说法)?错误(?:的选项|项)。/,'').trim();
+ let overview=q.explain||'';for(const reason of reasons)if(evidence.filter(e=>e.reason===reason).length===1)overview=overview.replaceAll(reason,'');overview=overview.replace(/^本题选(?:说法)?错误(?:的选项|项)。/,'').trim();
  const groups=new Map();order.forEach((orig,i)=>{const source=evidence[orig]?.sourceExcerpt;if(!source)return;const key=source.page+':'+source.text;if(!groups.has(key))groups.set(key,{...source,letters:[]});groups.get(key).letters.push('ABCD'[i])});
  const detailed=order.map((orig,i)=>{const e=evidence[orig]||{};const shared=e.reason&&evidence.filter(x=>x.reason===e.reason).length>1;return '<div class="option-analysis"><p><b>'+ 'ABCD'[i]+' · '+(expected.includes(orig)?'本题应选':'本题不选')+'</b></p>'+(!shared&&e.reason?'<p>'+esc(explanationInOrder(e.reason,order))+'</p>':'')+'</div>'}).join('');
  const shared=[...reasons].filter(reason=>evidence.filter(x=>x.reason===reason).length>1&&reason!==q.explain).map(reason=>'<p>'+esc(explanationInOrder(reason,order))+'</p>').join('');
